@@ -1,0 +1,30 @@
+*:8443 {
+  tls /etc/gatekeeper/server.crt /etc/gatekeeper/server.key
+  log stdout
+  root /var/lib/gatekeeper
+  ext .html
+  header /dashboard Cache-Control "no-cache, no-store, must-revalidate"
+
+  jwt {
+    path /dashboard
+    redirect /login
+    allow groups AzureAD_Administrator
+  }
+
+  login {
+    success_url /dashboard
+
+    azure_enabled true
+    azure_idp_metadata_location /etc/gatekeeper/azure_ad_idp_metadata.xml
+    azure_idp_sign_cert_location /etc/gatekeeper/azure_ad_signing_cert.pem
+    azure_tenant_id 1b9e886b-8ff2-4378-b6c8-6771259a5f51
+    azure_application_id 623cae7c-e6b2-43c5-853c-2059c9b2cb58
+    azure_application_name "My Infosec"
+    azure_metadata_url "https://localhost:8443/login"
+    azure_acs_url "https://localhost:8443/login"
+
+    # for testing, where no https is available, don't set the secure flag for the.
+    # cookie_secure false
+  }
+
+}
