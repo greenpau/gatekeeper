@@ -19,16 +19,10 @@ build:
 	@echo "Version: $(APP_VERSION), Branch: $(GIT_BRANCH), Revision: $(GIT_COMMIT)"
 	@echo "Build on $(BUILD_DATE) by $(BUILD_USER)"
 	@mkdir -p bin/
-	@CGO_ENABLED=0 go build -o bin/$(BINARY) $(VERBOSE) \
-		-ldflags="-w -s \
-		-X main.appName=$(BINARY) \
-		-X main.appVersion=$(APP_VERSION) \
-		-X main.gitBranch=$(GIT_BRANCH) \
-		-X main.gitCommit=$(GIT_COMMIT) \
-		-X main.buildUser=$(BUILD_USER) \
-		-X main.buildDate=$(BUILD_DATE)" \
-		-gcflags="all=-trimpath=$(GOPATH)/src" \
-		-asmflags="all=-trimpath $(GOPATH)/src" main.go
+	@go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
+	@xcaddy build v2.0.0 --output bin/$(BINARY) \
+		--with github.com/greenpau/caddy-auth-saml@v1.1.10  \
+		--with github.com/greenpau/caddy-auth-jwt@v0.0.13
 	@echo "Done!"
 
 test:
