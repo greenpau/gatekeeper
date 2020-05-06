@@ -22,7 +22,7 @@ build:
 	@go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
 	@xcaddy build v2.0.0 --output bin/$(BINARY) \
 		--with github.com/greenpau/caddy-auth-saml@v1.1.10 \
-		--with github.com/greenpau/caddy-auth-forms@v0.0.3 \
+		--with github.com/greenpau/caddy-auth-forms@v0.0.4 \
 		--with github.com/greenpau/caddy-auth-jwt@v0.0.13
 	@echo "Done!"
 

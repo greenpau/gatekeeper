@@ -20,7 +20,7 @@
               "match": [
                 {
                   "path": [
-                    "/saml*"
+                    "/auth*"
                   ]
                 }
               ],
@@ -69,6 +69,13 @@
               "terminal": true
             },
             {
+              "match": [
+                {
+                  "path": [
+                    "/saml*"
+                  ]
+                }
+              ],
               "handle": [
                 {
                   "handler": "authentication",
@@ -114,20 +121,13 @@
                   }
                 }
               ],
-              "match": [
-                {
-                  "path": [
-                    "/saml*"
-                  ]
-                }
-              ],
               "terminal": true
             },
             {
               "match": [
                 {
                   "path": [
-                    "/prometheus"
+                    "/prometheus*"
                   ]
                 }
               ],
@@ -177,11 +177,6 @@
                       "dial": "localhost:9080"
                     }
                   ]
-                },
-                {
-                  "body": "prometheus",
-                  "handler": "static_response",
-                  "status_code": 200
                 }
               ],
               "terminal": true
