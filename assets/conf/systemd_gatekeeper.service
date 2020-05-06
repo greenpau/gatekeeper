@@ -6,8 +6,8 @@ After=network.target
 [Service]
 Type=simple
 EnvironmentFile=-/etc/sysconfig/gatekeeper.conf
-ExecStart=/usr/local/bin/gatekeeper $OPTIONS
-ExecStartPre=/usr/local/bin/gatekeeper -validate $OPTIONS
+ExecStart=/usr/local/bin/gatekeeper run $OPTIONS
+ExecStartPre=/usr/local/bin/gatekeeper validate $OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 User=gatekeeper
