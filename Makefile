@@ -36,11 +36,16 @@ install:
 	@sudo mkdir -p /etc/$(BINARY)
 	@sudo rm -rf /var/lib/$(BINARY)/*
 	@sudo rm -rf /etc/sysconfig/$(BINARY).conf
-	@sudo cp -R assets/www/* /var/lib/$(BINARY)/
 	@cat assets/conf/sysconfig_$(BINARY).conf | sudo tee /etc/sysconfig/$(BINARY).conf
 	@cat assets/conf/systemd_$(BINARY).service | sudo tee /usr/lib/systemd/system/$(BINARY).service
 	@sudo chown -R $(GRP_NAME):$(USR_NAME) /var/{lib,log}/$(BINARY)
 	@sudo chown -R $(GRP_NAME):$(USR_NAME) /etc/$(BINARY)
-	@#sudo systemctl enable $(BINARY)
-	@#sudo systemctl start $(BINARY)
-	@#sudo systemctl status $(BINARY)
+	@sudo mkdir -p /etc/gatekeeper/auth/local/
+	@sudo mkdir -p /etc/gatekeeper/auth/saml/
+	@sudo mkdir -p /etc/gatekeeper/tls/
+	@sudo mkdir -p /etc/gatekeeper/ui/
+	@echo "If necessary, run the following commands:"
+	@echo "  sudo systemctl daemon-reload"
+	@echo "  sudo systemctl enable $(BINARY)"
+	@echo "  sudo systemctl start $(BINARY)"
+	@echo "  sudo systemctl status $(BINARY)"

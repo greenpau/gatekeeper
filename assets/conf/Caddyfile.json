@@ -8,7 +8,7 @@
   },
   "apps": {
     "http": {
-      "http_port": 8080,
+      "http_port": 8480,
       "https_port": 8443,
       "servers": {
         "srv0": {
@@ -26,15 +26,20 @@
                       "backends": [
                         {
                           "type": "local",
-                          "path": "/etc/caddy/auth/local/users.json",
+                          "path": "/etc/gatekeeper/auth/local/users.json",
                           "realm": "local"
                         }
                       ],
                       "jwt": {
+                        "token_name": "access_token",
                         "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
                         "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc"
                       },
                       "ui": {
+                        "templates": {
+                          "login": "/etc/gatekeeper/ui/forms_login.template",
+                          "portal": "/etc/gatekeeper/ui/forms_portal.template"
+                        },
                         "logo_url": "https://caddyserver.com/resources/images/caddy-circle-lock.svg",
                         "logo_description": "Caddy",
                         "allow_role_selection": false,
@@ -77,8 +82,8 @@
                         "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc"
                       },
                       "azure": {
-                        "idp_metadata_location": "/etc/caddy/auth/saml/idp/azure_ad_app_metadata.xml",
-                        "idp_sign_cert_location": "/etc/caddy/auth/saml/idp/azure_ad_app_signing_cert.pem",
+                        "idp_metadata_location": "/etc/gatekeeper/auth/saml/azure_ad_app_metadata.xml",
+                        "idp_sign_cert_location": "/etc/gatekeeper/auth/saml/azure_ad_app_signing_cert.pem",
                         "tenant_id": "1b9e886b-8ff2-4378-b6c8-6771259a5f51",
                         "application_id": "623cae7c-e6b2-43c5-853c-2059c9b2cb58",
                         "application_name": "My Infosec",
@@ -92,7 +97,18 @@
                         ]
                       },
                       "ui": {
-                        "auto_redirect_url": "/auth"
+                        "template_location": "/etc/gatekeeper/ui/saml_login.template",
+                        "auto_redirect_url": "",
+                        "private_links": [
+                          {
+                            "title": "Prometheus",
+                            "link": "/prometheus"
+                          },
+                          {
+                            "title": "Alertmanager",
+                            "link": "/alertmanager"
+                          }
+                        ]
                       }
                     }
                   }
@@ -125,7 +141,10 @@
                           "values": [
                             "anonymous",
                             "guest",
-                            "admin"
+                            "admin",
+                            "AzureAD_Administrator",
+                            "AzureAD_Editor",
+                            "AzureAD_Viewer"
                           ]
                         }
                       ],
@@ -172,7 +191,10 @@
                           "values": [
                             "anonymous",
                             "guest",
-                            "admin"
+                            "admin",
+                            "AzureAD_Administrator",
+                            "AzureAD_Editor",
+                            "AzureAD_Viewer"
                           ]
                         }
                       ]
@@ -228,8 +250,8 @@
       "certificates": {
         "load_files": [
           {
-            "certificate": "/etc/caddy/tls/server.crt",
-            "key": "/etc/caddy/tls/server.key",
+            "certificate": "/etc/gatekeeper/tls/server.crt",
+            "key": "/etc/gatekeeper/tls/server.key",
             "tags": [
               "cert0"
             ]
