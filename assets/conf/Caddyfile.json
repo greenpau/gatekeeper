@@ -17,6 +17,13 @@
           ],
           "routes": [
             {
+              "match": [
+                {
+                  "path": [
+                    "/saml*"
+                  ]
+                }
+              ],
               "handle": [
                 {
                   "handler": "authentication",
@@ -57,13 +64,6 @@
                       }
                     }
                   }
-                }
-              ],
-              "match": [
-                {
-                  "path": [
-                    "/auth*"
-                  ]
                 }
               ],
               "terminal": true
@@ -124,6 +124,13 @@
               "terminal": true
             },
             {
+              "match": [
+                {
+                  "path": [
+                    "/prometheus"
+                  ]
+                }
+              ],
               "handle": [
                 {
                   "handler": "authentication",
@@ -164,21 +171,29 @@
                   }
                 },
                 {
+                  "handler": "reverse_proxy",
+                  "upstreams": [
+                    {
+                      "dial": "localhost:9080"
+                    }
+                  ]
+                },
+                {
                   "body": "prometheus",
                   "handler": "static_response",
                   "status_code": 200
                 }
               ],
-              "match": [
-                {
-                  "path": [
-                    "/prometheus"
-                  ]
-                }
-              ],
               "terminal": true
             },
             {
+              "match": [
+                {
+                  "path": [
+                    "/alertmanager*"
+                  ]
+                }
+              ],
               "handle": [
                 {
                   "handler": "authentication",
@@ -202,15 +217,15 @@
                   }
                 },
                 {
-                  "body": "alertmanager",
-                  "handler": "static_response",
-                  "status_code": 200
-                }
-              ],
-              "match": [
+                  "handler": "rewrite",
+                  "strip_path_prefix": "/alertmanager"
+                },
                 {
-                  "path": [
-                    "/alertmanager"
+                  "handler": "reverse_proxy",
+                  "upstreams": [
+                    {
+                      "dial": "localhost:9083"
+                    }
                   ]
                 }
               ],
