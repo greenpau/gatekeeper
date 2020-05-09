@@ -15,19 +15,33 @@ all: build
 clean:
 	@rm -rf bin/
 
-build:
+version:
 	@echo "Version: $(APP_VERSION), Branch: $(GIT_BRANCH), Revision: $(GIT_COMMIT)"
 	@echo "Build on $(BUILD_DATE) by $(BUILD_USER)"
+
+build-dir:
 	@mkdir -p bin/
-	@go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
+
+
+build: version build-dir
 	@xcaddy build v2.0.0 --output bin/$(BINARY) \
 		--with github.com/greenpau/caddy-auth-saml@v1.1.10 \
 		--with github.com/greenpau/caddy-auth-forms@v0.0.4 \
 		--with github.com/greenpau/caddy-auth-jwt@v0.0.13
-	@echo "Done!"
 
-test:
+build-forms: version build-dir
+	@xcaddy build v2.0.0 --output bin/$(BINARY)-forms \
+		--with github.com/greenpau/caddy-auth-forms@v0.0.4 \
+		--with github.com/greenpau/caddy-auth-jwt@v0.0.13
+
+test: version
 	@./bin/$(BINARY) validate -config assets/conf/Caddyfile.json
+
+test-forms:
+	@./bin/$(BINARY)-forms validate -config assets/conf/Caddyfile_forms.json
+
+dep:
+	@go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
 
 install:
 	@sudo groupadd --system $(GRP_NAME) || true
@@ -38,12 +52,13 @@ install:
 	@sudo rm -rf /etc/sysconfig/$(BINARY).conf
 	@cat assets/conf/sysconfig_$(BINARY).conf | sudo tee /etc/sysconfig/$(BINARY).conf
 	@cat assets/conf/systemd_$(BINARY).service | sudo tee /usr/lib/systemd/system/$(BINARY).service
-	@sudo chown -R $(GRP_NAME):$(USR_NAME) /var/{lib,log}/$(BINARY)
-	@sudo chown -R $(GRP_NAME):$(USR_NAME) /etc/$(BINARY)
+	@sudo mkdir -p /etc/gatekeeper/auth/jwt/
 	@sudo mkdir -p /etc/gatekeeper/auth/local/
 	@sudo mkdir -p /etc/gatekeeper/auth/saml/
 	@sudo mkdir -p /etc/gatekeeper/tls/
 	@sudo mkdir -p /etc/gatekeeper/ui/
+	@sudo chown -R $(GRP_NAME):$(USR_NAME) /etc/$(BINARY)
+	@sudo chown -R $(GRP_NAME):$(USR_NAME) /var/{lib,log}/$(BINARY)
 	@echo "If necessary, run the following commands:"
 	@echo "  sudo systemctl daemon-reload"
 	@echo "  sudo systemctl enable $(BINARY)"
