@@ -31,7 +31,7 @@ sudo chown -R gatekeeper:gatekeeper /etc/gatekeeper/
 Then, copy the binary and associated configuration file.
 
 ```bash
-sudo cp assets/conf/Caddyfile.json /etc/gatekeeper/Caddyfile.json
+sudo cp assets/conf/config.json /etc/gatekeeper/config.json
 sudo cp bin/gatekeeper /usr/local/bin/gatekeeper
 make install
 ```
