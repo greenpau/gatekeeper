@@ -1,4 +1,10 @@
 {
+  "admin": {
+    "disabled": true,
+    "config": {
+      "persist": false
+    }
+  },
   "logging": {
     "logs": {
       "default": {
@@ -7,6 +13,87 @@
     }
   },
   "apps": {
+    "auth": {
+      "providers": [
+        {
+          "provider_type": "forms",
+          "auth_url_path": "/auth",
+          "backends": [
+            {
+              "type": "local",
+              "path": "/etc/gatekeeper/auth/local/users.json",
+              "realm": "local"
+            }
+          ],
+          "jwt": {
+            "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
+            "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc"
+          },
+          "ui": {
+            "templates": {
+              "login": "/etc/gatekeeper/ui/forms_login.template",
+              "portal": "/etc/gatekeeper/ui/forms_portal.template"
+            },
+            "logo_url": "https://caddyserver.com/resources/images/caddy-circle-lock.svg",
+            "logo_description": "Caddy",
+            "allow_role_selection": false,
+            "auto_redirect_url": "",
+            "private_links": [
+              {
+                "title": "Prometheus",
+                "link": "/prometheus"
+              },
+              {
+                "title": "Alertmanager",
+                "link": "/alertmanager"
+              },
+              {
+                "title": "AssetQ UI Development",
+                "link": "/assetq-ui-dev/"
+              },
+              {
+                "title": "AssetQ API Development",
+                "link": "/assetq-api-dev/"
+              }
+            ]
+          }
+        },
+        {
+          "provider_type": "jwt",
+          "context": "default",
+          "token_name": "access_token",
+          "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
+          "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc",
+          "auth_url_path": "/auth",
+          "access_list": [
+            {
+              "action": "allow",
+              "claim": "roles",
+              "values": [
+                "anonymous",
+                "guest",
+                "viewer",
+                "editor",
+                "admin",
+                "superadmin"
+              ]
+            }
+          ],
+          "strip_token": false,
+          "pass_claims": false,
+          "token_types": [
+            "HS256",
+            "HS384",
+            "HS512"
+          ],
+          "token_sources": [
+            "header",
+            "cookie",
+            "query"
+          ]
+        }
+      ]
+    },
     "http": {
       "http_port": 8480,
       "https_port": 8443,
@@ -38,6 +125,14 @@
               "terminal": true
             },
             {
+              "handle": [
+                {
+                  "handler": "authentication",
+                  "providers": {
+                    "forms": {}
+                  }
+                }
+              ],
               "match": [
                 {
                   "path": [
@@ -45,103 +140,49 @@
                   ]
                 }
               ],
-              "handle": [
-                {
-                  "handler": "authentication",
-                  "providers": {
-                    "forms": {
-                      "auth_url_path": "/auth",
-                      "backends": [
-                        {
-                          "type": "local",
-                          "path": "/etc/gatekeeper/auth/local/users.json",
-                          "realm": "local"
-                        }
-                      ],
-                      "jwt": {
-                        "token_name": "access_token",
-                        "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
-                        "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc"
-                      },
-                      "ui": {
-                        "templates": {
-                          "login": "/etc/gatekeeper/ui/forms_login.template",
-                          "portal": "/etc/gatekeeper/ui/forms_portal.template"
-                        },
-                        "logo_url": "https://caddyserver.com/resources/images/caddy-circle-lock.svg",
-                        "logo_description": "Caddy",
-                        "allow_role_selection": false,
-                        "auto_redirect_url": "",
-                        "private_links": [
-                          {
-                            "title": "AssetQ Production",
-                            "link": "/assetq-prod"
-                          },
-                          {
-                            "title": "AssetQ Development",
-                            "link": "/assetq-dev"
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              ],
               "terminal": true
             },
             {
-              "match": [
-                {
-                  "path": [
-                    "/assetq-prod*"
-                  ]
-                }
-              ],
               "handle": [
                 {
                   "handler": "authentication",
                   "providers": {
-                    "jwt": {
-                      "master": true,
-                      "token_name": "access_token",
-                      "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
-                      "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc",
-                      "auth_url_path": "/auth",
-                      "access_list": [
-                        {
-                          "action": "allow",
-                          "claim": "roles",
-                          "values": [
-                            "anonymous",
-                            "guest",
-                            "viewer",
-                            "editor",
-                            "admin",
-                            "superadmin"
-                          ]
-                        }
-                      ],
-                      "strip_token": false,
-                      "pass_claims": false,
-                      "token_types": [
-                        "HS256",
-                        "HS384",
-                        "HS512"
-                      ],
-                      "token_sources": [
-                        "header",
-                        "cookie",
-                        "query"
-                      ]
-                    }
+                    "jwt": {}
                   }
                 },
                 {
-                  "handler": "reverse_proxy",
-                  "upstreams": [
-                    {
-                      "dial": "localhost:3008"
-                    }
+                  "handler": "static_response",
+                  "status_code": 200,
+                  "body": "prometheus"
+                }
+              ],
+              "match": [
+                {
+                  "path": [
+                    "/prometheus"
+                  ]
+                }
+              ],
+              "terminal": true
+            },
+            {
+              "handle": [
+                {
+                  "handler": "authentication",
+                  "providers": {
+                    "jwt": {}
+                  }
+                },
+                {
+                  "handler": "static_response",
+                  "status_code": 200,
+                  "body": "alertmanager"
+                }
+              ],
+              "match": [
+                {
+                  "path": [
+                    "/alertmanager"
                   ]
                 }
               ],
@@ -151,11 +192,25 @@
               "match": [
                 {
                   "path": [
-                    "/assetq-dev*"
+                    "/assetq-ui-dev*"
                   ]
                 }
               ],
               "handle": [
+                {
+                  "handler": "authentication",
+                  "providers": {
+                    "jwt": {}
+                  }
+                },
+                {
+                  "handler": "rewrite",
+                  "strip_path_suffix": "inventory"
+                },
+                {
+                  "handler": "rewrite",
+                  "strip_path_suffix": "datasources"
+                },
                 {
                   "handler": "reverse_proxy",
                   "upstreams": [
@@ -168,11 +223,41 @@
               "terminal": true
             },
             {
+              "match": [
+                {
+                  "path": [
+                    "/assetq-api-dev*"
+                  ]
+                }
+              ],
               "handle": [
                 {
-                  "body": "1.0.0",
+                  "handler": "authentication",
+                  "providers": {
+                    "jwt": {}
+                  }
+                },
+                {
+                  "handler": "rewrite",
+                  "strip_path_prefix": "/assetq-api-dev"
+                },
+                {
+                  "handler": "reverse_proxy",
+                  "upstreams": [
+                    {
+                      "dial": "localhost:3017"
+                    }
+                  ]
+                }
+              ],
+              "terminal": true
+            },
+            {
+              "handle": [
+                {
                   "handler": "static_response",
-                  "status_code": 200
+                  "status_code": 200,
+                  "body": "1.0.0"
                 }
               ],
               "match": [

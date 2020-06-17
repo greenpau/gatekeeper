@@ -4,10 +4,13 @@ GIT_COMMIT:=$(shell git describe --dirty --always)
 GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD -- | head -1)
 BUILD_USER:=$(shell whoami)
 BUILD_DATE:=$(shell date +"%Y-%m-%d")
+BUILD_DIR:=$(shell pwd)
 BINARY:="gatekeeper"
 VERBOSE:=-v
 GRP_NAME="gatekeeper"
 USR_NAME="gatekeeper"
+CADDY_VERSION="v2.1.0-beta.1"
+CADDY_AUTH_VERSION="v1.0.3"
 
 
 all: build
@@ -24,19 +27,20 @@ build-dir:
 
 
 build: version build-dir
-	@xcaddy build v2.0.0 --output bin/$(BINARY) \
-		--with github.com/greenpau/caddy-auth@v1.0.2
+	@xcaddy build $(CADDY_VERSION) --output bin/$(BINARY) \
+		--with github.com/greenpau/caddy-auth@$(CADDY_AUTH_VERSION)
 
-build-forms: version build-dir
-	@xcaddy build v2.0.0 --output bin/$(BINARY)-forms \
-		--with github.com/greenpau/caddy-auth-forms@v0.0.6 \
-		--with github.com/greenpau/caddy-auth-jwt@v0.0.13
+localbuild: version build-dir
+	@rm -rf ./bin/caddy
+	@rm -rf ../xcaddy-$(BINARY)/*
+	@mkdir -p ../xcaddy-$(BINARY)/ && cd ../xcaddy-$(BINARY)/ && \
+		xcaddy build $(CADDY_VERSION) --output ../$(BINARY)/bin/$(BINARY) \
+		--with github.com/greenpau/caddy-auth@latest=$(BUILD_DIR)/../caddy-auth \
+		--with github.com/greenpau/caddy-auth-forms@latest=$(BUILD_DIR)/../caddy-auth-forms \
+		--with github.com/greenpau/caddy-auth-jwt@latest=$(BUILD_DIR)/../caddy-auth-jwt
 
 test: version
 	@./bin/$(BINARY) validate -config assets/conf/config.json
-
-test-forms:
-	@./bin/$(BINARY)-forms validate -config assets/conf/config_forms.json
 
 dep:
 	@go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
