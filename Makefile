@@ -10,7 +10,7 @@ VERBOSE:=-v
 GRP_NAME="gatekeeper"
 USR_NAME="gatekeeper"
 CADDY_VERSION="v2.1.0-beta.1"
-CADDY_AUTH_VERSION="v1.0.3"
+CADDY_AUTH_VERSION="v1.0.4"
 
 
 all: build
