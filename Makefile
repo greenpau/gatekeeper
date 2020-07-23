@@ -36,7 +36,7 @@ localbuild: version build-dir
 	@mkdir -p ../xcaddy-$(BINARY)/ && cd ../xcaddy-$(BINARY)/ && \
 		xcaddy build $(CADDY_VERSION) --output ../$(BINARY)/bin/$(BINARY) \
 		--with github.com/greenpau/caddy-auth@latest=$(BUILD_DIR)/../caddy-auth \
-		--with github.com/greenpau/caddy-auth-forms@latest=$(BUILD_DIR)/../caddy-auth-forms \
+		--with github.com/greenpau/caddy-auth-portal@latest=$(BUILD_DIR)/../caddy-auth-portal \
 		--with github.com/greenpau/caddy-auth-jwt@latest=$(BUILD_DIR)/../caddy-auth-jwt
 
 test: version
