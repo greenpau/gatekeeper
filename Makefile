@@ -46,6 +46,7 @@ dep:
 	@go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
 
 install:
+	@sudo cp ./bin/$(BINARY) /usr/local/bin/gatekeeper
 	@sudo groupadd --system $(GRP_NAME) || true
 	@sudo useradd --system -d /var/lib/%{name} -s /bin/bash -g $(GRP_NAME) $(USR_NAME) || true
 	@sudo mkdir -p /var/{lib,log}/$(BINARY)
