@@ -10,8 +10,6 @@ VERBOSE:=-v
 GRP_NAME="gatekeeper"
 USR_NAME="gatekeeper"
 CADDY_VERSION="v2.1.1"
-CADDY_AUTH_VERSION="v1.0.10"
-
 
 all: build
 
@@ -28,19 +26,24 @@ build-dir:
 
 build: version build-dir
 	@xcaddy build $(CADDY_VERSION) --output bin/$(BINARY) \
-		--with github.com/greenpau/caddy-auth@$(CADDY_AUTH_VERSION)
+		--with github.com/greenpau/caddy-auth-portal@lastest \
+		--with github.com/greenpau/caddy-auth-jwt@latest \
+		--with github.com/greenpau/caddy-auth-saml@latest \
+		--with github.com/greenpau/caddy-request-debug
 
 localbuild: version build-dir
 	@rm -rf ./bin/caddy
 	@rm -rf ../xcaddy-$(BINARY)/*
 	@mkdir -p ../xcaddy-$(BINARY)/ && cd ../xcaddy-$(BINARY)/ && \
 		xcaddy build $(CADDY_VERSION) --output ../$(BINARY)/bin/$(BINARY) \
-		--with github.com/greenpau/caddy-auth@latest=$(BUILD_DIR)/../caddy-auth \
 		--with github.com/greenpau/caddy-auth-portal@latest=$(BUILD_DIR)/../caddy-auth-portal \
-		--with github.com/greenpau/caddy-auth-jwt@latest=$(BUILD_DIR)/../caddy-auth-jwt
+		--with github.com/greenpau/caddy-auth-jwt@latest=$(BUILD_DIR)/../caddy-auth-jwt \
+		--with github.com/greenpau/caddy-auth-saml@latest=$(BUILD_DIR)/../caddy-auth-saml \
+		--with github.com/greenpau/caddy-request-debug@latest=$(BUILD_DIR)/../caddy-request-debug
 
 test: version
 	@./bin/$(BINARY) validate -config assets/conf/config.json
+	@./bin/$(BINARY) validate -config assets/conf/Caddyfile
 
 dep:
 	@go get -u github.com/caddyserver/xcaddy/cmd/xcaddy

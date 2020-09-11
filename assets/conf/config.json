@@ -47,44 +47,44 @@
               ],
               "handle": [
                 {
-                  "handler": "authentication",
-                  "providers": {
-                    "forms": {
-                      "master": true,
-                      "auth_url_path": "/auth",
-                      "backends": [
-                        {
-                          "type": "local",
-                          "path": "/etc/gatekeeper/auth/local/users.json",
-                          "realm": "local"
-                        }
-                      ],
-                      "jwt": {
-                        "token_name": "access_token",
-                        "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
-                        "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc"
-                      },
-                      "ui": {
-                        "templates": {
-                          "login": "/etc/gatekeeper/ui/forms_login.template",
-                          "portal": "/etc/gatekeeper/ui/forms_portal.template"
-                        },
-                        "logo_url": "https://caddyserver.com/resources/images/caddy-circle-lock.svg",
-                        "logo_description": "Caddy",
-                        "allow_role_selection": false,
-                        "auto_redirect_url": "",
-                        "private_links": [
-                          {
-                            "title": "Prometheus",
-                            "link": "/prometheus"
-                          },
-                          {
-                            "title": "Alertmanager",
-                            "link": "/alertmanager"
-                          }
-                        ]
-                      }
+                  "handler": "auth_portal",
+                  "primary": true,
+                  "auth_url_path": "/auth",
+                  "backends": [
+                    {
+                      "type": "local",
+                      "path": "/etc/gatekeeper/auth/local/users.json",
+                      "realm": "local"
                     }
+                  ],
+                  "jwt": {
+                    "token_name": "access_token",
+                    "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
+                    "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc"
+                  },
+                  "ui": {
+                    "templates": {
+                      "login": "/etc/gatekeeper/ui/forms_login.template",
+                      "portal": "/etc/gatekeeper/ui/forms_portal.template"
+                    },
+                    "logo_url": "https://caddyserver.com/resources/images/caddy-circle-lock.svg",
+                    "logo_description": "Caddy",
+                    "allow_role_selection": false,
+                    "auto_redirect_url": "",
+                    "private_links": [
+                      {
+                        "title": "Prometheus",
+                        "link": "/prometheus"
+                      },
+                      {
+                        "title": "Alertmanager",
+                        "link": "/alertmanager"
+                      },
+                      {
+                        "title": "My App",
+                        "link": "/myapp"
+                      }
+                    ]
                   }
                 }
               ],
@@ -136,6 +136,10 @@
                           {
                             "title": "Alertmanager",
                             "link": "/alertmanager"
+                          },
+                          {
+                            "title": "My App",
+                            "link": "/myapp"
                           }
                         ]
                       }
@@ -158,10 +162,14 @@
                   "handler": "authentication",
                   "providers": {
                     "jwt": {
-                      "master": true,
-                      "token_name": "access_token",
-                      "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
-                      "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc",
+                      "primary": true,
+                      "trusted_tokens": [
+                        {
+                          "token_name": "access_token",
+                          "token_secret": "0e2fdcf8-6868-41a7-884b-7308795fc286",
+                          "token_issuer": "e1008f2d-ccfa-4e62-bbe6-c202ec2988cc"
+                        }
+                      ],
                       "auth_url_path": "/auth",
                       "access_list": [
                         {
@@ -171,6 +179,7 @@
                             "anonymous",
                             "guest",
                             "admin",
+                            "superadmin",
                             "AzureAD_Administrator",
                             "AzureAD_Editor",
                             "AzureAD_Viewer"
@@ -224,6 +233,7 @@
                             "anonymous",
                             "guest",
                             "admin",
+                            "superadmin",
                             "AzureAD_Administrator",
                             "AzureAD_Editor",
                             "AzureAD_Viewer"
@@ -244,6 +254,45 @@
                       "dial": "localhost:9083"
                     }
                   ]
+                }
+              ],
+              "terminal": true
+            },
+            {
+              "match": [
+                {
+                  "path": [
+                    "/myapp*"
+                  ]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "authentication",
+                  "providers": {
+                    "jwt": {
+                      "access_list": [
+                        {
+                          "action": "allow",
+                          "claim": "roles",
+                          "values": [
+                            "anonymous",
+                            "guest",
+                            "admin",
+                            "superadmin",
+                            "AzureAD_Administrator",
+                            "AzureAD_Editor",
+                            "AzureAD_Viewer"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "body": "myapp",
+                  "handler": "static_response",
+                  "status_code": 200
                 }
               ],
               "terminal": true
