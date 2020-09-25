@@ -19,19 +19,10 @@ Next, pre-provision the relevant directories:
 make install
 ```
 
-Additionally, download the following UI elements:
-
-```bash
-sudo wget -O /etc/gatekeeper/ui/saml_login.template https://raw.githubusercontent.com/greenpau/caddy-auth-ui/main/assets/templates/saml_login.template
-sudo wget -O /etc/gatekeeper/ui/forms_login.template https://raw.githubusercontent.com/greenpau/caddy-auth-ui/main/assets/templates/forms_login.template
-sudo wget -O /etc/gatekeeper/ui/forms_portal.template https://raw.githubusercontent.com/greenpau/caddy-auth-ui/main/assets/templates/forms_portal.template
-sudo chown -R gatekeeper:gatekeeper /etc/gatekeeper/
-```
-
 Then, copy the binary and associated configuration file.
 
 ```bash
-sudo cp assets/conf/config.json /etc/gatekeeper/config.json
+sudo cp assets/conf/Caddyfile /etc/gatekeeper/Caddyfile
 sudo cp bin/gatekeeper /usr/local/bin/gatekeeper
 make install
 ```
