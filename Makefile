@@ -9,7 +9,7 @@ BINARY:="gatekeeper"
 VERBOSE:=-v
 GRP_NAME="gatekeeper"
 USR_NAME="gatekeeper"
-CADDY_VERSION="v2.1.1"
+CADDY_VERSION="v2.2.0"
 
 all: build
 
@@ -26,8 +26,8 @@ build-dir:
 
 build: version build-dir
 	@xcaddy build $(CADDY_VERSION) --output bin/$(BINARY) \
-		--with github.com/greenpau/caddy-auth-portal@latest \
-		--with github.com/greenpau/caddy-auth-jwt@latest \
+		--with github.com/greenpau/caddy-auth-portal@v1.1.8 \
+		--with github.com/greenpau/caddy-auth-jwt@v1.0.17 \
 		--with github.com/greenpau/caddy-trace@latest
 
 localbuild: version build-dir
